@@ -1,18 +1,7 @@
-package filesystem
-
-import testdata "sstable/test/util"
+package mockfilesystem
 
 type DummyFile struct {
 	content string
-}
-
-func NewDummyFile(content string) *DummyFile {
-	return &DummyFile{content: content}
-}
-
-func NewDummyFileFromAnotherFile(filePaths string) *DummyFile {
-	content := testdata.ReadTestData(filePaths)
-	return &DummyFile{content: content}
 }
 
 func (file *DummyFile) Open() error {

@@ -1,11 +1,9 @@
-package memtable
+package testmemtable
 
 import (
 	"encoding/json"
-	"path"
-	filesystem "sstable/filesystem"
-	mockfilesystem "sstable/filesystem/mock"
 
+	"sstable/test/util/mockmemtable"
 	"sstable/util"
 	"strings"
 	"testing"
@@ -13,38 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const MEMTABLE_TEST_DATA_FOLDER = "memtable"
 const BASIC_TEST_DATA = "basic_1.log"
-
-func createDummyFile(dataFileName string) filesystem.FileOperation {
-	fullPath := path.Join(MEMTABLE_TEST_DATA_FOLDER, dataFileName)
-	var fileOperation filesystem.FileOperation = mockfilesystem.NewDummyFileFromAnotherFile(fullPath)
-	return fileOperation
-}
-
-func createEmptyFile() filesystem.FileOperation {
-	var fileOperation filesystem.FileOperation = mockfilesystem.NewDummyFile("")
-	return fileOperation
-}
-
-func createDummyMemoryTable(dataFileName string) MemoryTable {
-	dummyFile := createDummyFile(dataFileName)
-	memtableInstance := NewMemoryTable(dummyFile)
-	return memtableInstance
-}
-
-func createReadyBasicDummyMemoryTable() MemoryTable {
-	memoryTable := createDummyMemoryTable(BASIC_TEST_DATA)
-	memoryTable.LoadMemoryTable()
-	return memoryTable
-}
-
-func createReadyEmptyDummyMemoryTable() (MemoryTable, filesystem.FileOperation) {
-	fileOperation := createEmptyFile()
-	memoryTable := NewMemoryTable(fileOperation)
-	memoryTable.LoadMemoryTable()
-	return memoryTable, fileOperation
-}
 
 func getKeyValueJson(key string, value any) string {
 
@@ -63,7 +30,7 @@ func TestMemtableReadInt(t *testing.T) {
 	expectValue := 14
 
 	//act
-	sut := createReadyBasicDummyMemoryTable()
+	sut := mockmemtable.NewReadyBasicMemtable()
 	result := sut.Read("score#deea")
 
 	//assert
@@ -77,7 +44,7 @@ func TestMemtableReadString(t *testing.T) {
 	expectValue := "deeax99"
 
 	//act
-	sut := createReadyBasicDummyMemoryTable()
+	sut := mockmemtable.NewReadyBasicMemtable()
 	result := sut.Read("nickname#deea")
 
 	//assert
@@ -95,7 +62,7 @@ func TestMemtableReadObject(t *testing.T) {
 	}
 
 	//act
-	sut := createReadyBasicDummyMemoryTable()
+	sut := mockmemtable.NewReadyBasicMemtable()
 	result := sut.Read("profile#deea")
 
 	//assert
@@ -104,7 +71,7 @@ func TestMemtableReadObject(t *testing.T) {
 
 func TestMemtableWrite(t *testing.T) {
 	//arrange
-	memoryTable, dummyFile := createReadyEmptyDummyMemoryTable()
+	memoryTable, dummyFile := mockmemtable.NewReadyEmptyMemtable()
 	key := "user_score#deeax99"
 	value := 10.0
 	expectedJson := getKeyValueJson(key, value)

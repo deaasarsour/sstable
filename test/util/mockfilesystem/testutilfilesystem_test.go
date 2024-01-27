@@ -1,8 +1,6 @@
-package filesystem_test
+package mockfilesystem
 
 import (
-	mockfilesystem "sstable/filesystem/mock"
-
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +12,7 @@ func TestMockBasic(t *testing.T) {
 	file2ExpectedContent := []byte("file 2 :)")
 
 	//act
-	root := mockfilesystem.NewDummyDirectory()
+	root := NewDummyDirectory()
 
 	root.CreateFile("file1.txt", file1ExpectedContent)
 	root.CreateFile("file2.txt", file2ExpectedContent)
@@ -38,7 +36,7 @@ func TestMockDeletion(t *testing.T) {
 	file1ExpectedContent := []byte("file 1 :)")
 
 	//act
-	root := mockfilesystem.NewDummyDirectory()
+	root := NewDummyDirectory()
 
 	root.CreateFile("file1.txt", file1ExpectedContent)
 	root.DeleteFile("file1.txt")
@@ -58,7 +56,7 @@ func TestAppend(t *testing.T) {
 	expectedContent := []byte("Hello World!")
 
 	//act
-	file := mockfilesystem.NewDummyFile(string(part1Content))
+	file := NewDummyFile(string(part1Content))
 	file.AppendBytes(part2Content)
 	actualContent, _ := file.ReadAll()
 

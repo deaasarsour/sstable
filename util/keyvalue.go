@@ -1,6 +1,6 @@
 package util
 
 type KeyValueObject struct {
-	Key   string
-	Value any
+	Key   string `json:"key"`
+	Value any    `json:"value"`
 }

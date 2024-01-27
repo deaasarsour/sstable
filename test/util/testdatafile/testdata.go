@@ -1,4 +1,4 @@
-package testdata
+package testdatafile
 
 import (
 	"os"
@@ -11,7 +11,7 @@ const TEST_DATA_ROOT = "/test/data"
 
 func ReadTestData(filePath string) string {
 	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(filepath.Dir(filepath.Dir(b)))
+	basepath := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(b))))
 
 	fullPath := path.Join(basepath, TEST_DATA_ROOT, filePath)
 

@@ -13,7 +13,7 @@ func generateMemtableName() string {
 func (dbms *DatabaseManagementSystem) loadMemtableFromFile(memtableFile filesystem.FileOperation) error {
 	memtable := memtable.NewMemoryTable(memtableFile)
 	if err := memtable.LoadMemoryTable(); err == nil {
-		dbms.memoryTable.Store(&memtable)
+		dbms.memoryTable.Store(memtable)
 		return nil
 	} else {
 		return err

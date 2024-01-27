@@ -1,7 +1,7 @@
 package dbms
 
 import (
-	filesystem "sstable/filesystem/mock"
+	"sstable/test/util/mockfilesystem"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +22,7 @@ func TestMemtableEmpty(t *testing.T) {
 
 func TestMemtableLoad(t *testing.T) {
 	//arrange
-	rootDirectory := filesystem.NewDummyDirectory()
+	rootDirectory := mockfilesystem.NewDummyDirectory()
 	key, value := "k", "v"
 
 	//act

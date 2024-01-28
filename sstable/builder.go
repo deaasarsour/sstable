@@ -15,19 +15,23 @@ func NewSSTable(file filesystem.FileOperation) *SSTable {
 
 func FlushSSTable(memtable memtable.MemoryTableLowLevel, file filesystem.FileOperation) (*SSTable, error) {
 
-	if !memtable.IsLoaded() {
-		if err := memtable.LoadMemoryTable(); err != nil {
-			return nil, err
-		}
-	}
-
-	records := memtable.GetRecords()
-
-	if err := flushSSTableMetadata(records, file); err != nil {
+	if err := loadMemtableIfNeeded(memtable); err != nil {
 		return nil, err
 	}
 
-	if err := flushMemtableRecords(records, file); err != nil {
+	records := memtable.GetRecords()
+	sortedRecords := getRecordsSorted(records)
+	serializedRecords, err := serializeSSTableRecords(sortedRecords)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := flushSSTableMetadata(serializedRecords, file); err != nil {
+		return nil, err
+	}
+
+	if err := flushSerializedRecords(serializedRecords, file); err != nil {
 		return nil, err
 	}
 
@@ -38,14 +42,31 @@ func FlushSSTable(memtable memtable.MemoryTableLowLevel, file filesystem.FileOpe
 	return NewSSTable(file), nil
 }
 
+func loadMemtableIfNeeded(memtable memtable.MemoryTableLowLevel) error {
+	if !memtable.IsLoaded() {
+		if err := memtable.LoadMemoryTable(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func sealSSTableFile(file filesystem.FileOperation) error {
 	return file.AppendBytes([]byte(SEALED))
 }
 
-func flushSSTableMetadata(records map[string]any, file filesystem.FileOperation) error {
+func flushSSTableMetadata(records [][]byte, file filesystem.FileOperation) error {
+	recordsCount := len(records)
+
 	metadata := sstableMetadata{
-		RowCount: len(records),
+		RowCount:   recordsCount,
+		RowOffsets: make([]int, recordsCount),
 	}
+
+	for i := range records {
+		metadata.RowOffsets[i] = len(records[i])
+	}
+
 	if serialized, err := json.Marshal(metadata); err == nil {
 		if err := file.AppendBytes(serialized); err != nil {
 			return err
@@ -57,20 +78,6 @@ func flushSSTableMetadata(records map[string]any, file filesystem.FileOperation)
 	} else {
 		return nil
 	}
-}
-
-func flushMemtableRecords(records map[string]any, file filesystem.FileOperation) error {
-	sortedRecords := getRecordsSorted(records)
-
-	if serializedRecords, err := serializeSSTableRecords(sortedRecords); err == nil {
-		if err := flushSerializedRecords(serializedRecords, file); err != nil {
-			return err
-		}
-	} else {
-		return err
-	}
-
-	return nil
 }
 
 func flushSerializedRecords(records [][]byte, file filesystem.FileOperation) error {

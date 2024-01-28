@@ -3,7 +3,8 @@ package sstable
 import "sstable/filesystem"
 
 type sstableMetadata struct {
-	RowCount int `json:"row_count"`
+	RowCount   int   `json:"row_count"`
+	RowOffsets []int `json:"row_offsets"`
 }
 
 type sstableRecord struct {

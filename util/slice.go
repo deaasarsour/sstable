@@ -17,3 +17,11 @@ func IsContains[T comparable](arr []T, match *T) bool {
 	}
 	return false
 }
+
+func DeepCopy[T any](src []T, dest []T, startIndex, endIndex int) []T {
+	len := endIndex - startIndex + 1
+	for i := 0; i < len; i++ {
+		dest[i] = src[i+startIndex]
+	}
+	return dest
+}

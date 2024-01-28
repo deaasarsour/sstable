@@ -8,6 +8,8 @@ import (
 )
 
 const TEST_DATA_ROOT = "/test/data"
+const MEMTABLE_TEST_DATA_FOLDER = "memtable"
+const SSTABLE_TEST_DATA_FOLDER = "sstable"
 
 func ReadTestData(filePath string) string {
 	_, b, _, _ := runtime.Caller(0)
@@ -22,4 +24,14 @@ func ReadTestData(filePath string) string {
 	}
 
 	return string(bytes)
+}
+
+func ReadSSTableData(fileName string) string {
+	fullPath := path.Join(SSTABLE_TEST_DATA_FOLDER, fileName)
+	return ReadTestData(fullPath)
+}
+
+func ReadMemtableData(fileName string) string {
+	fullPath := path.Join(MEMTABLE_TEST_DATA_FOLDER, fileName)
+	return ReadTestData(fullPath)
 }

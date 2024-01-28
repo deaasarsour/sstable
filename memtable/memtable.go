@@ -7,14 +7,26 @@ import (
 	"strings"
 )
 
-type MemoryTable struct {
-	file    filesystem.FileOperation
-	records map[string]any
+type MemoryTableIO interface {
+	Read(key string) any
+	Write(key string, value any) error
 }
 
-func NewMemoryTable(file filesystem.FileOperation) MemoryTable {
+type MemoryTableLowLevel interface {
+	GetRecords() map[string]any
+	IsLoaded() bool
+	LoadMemoryTable() error
+}
+
+type MemoryTable struct {
+	file     filesystem.FileOperation
+	records  map[string]any
+	isLoaded bool
+}
+
+func NewMemoryTable(file filesystem.FileOperation) *MemoryTable {
 	records := make(map[string]any)
-	return MemoryTable{file: file, records: records}
+	return &MemoryTable{file: file, records: records}
 }
 
 func (memtable *MemoryTable) Read(key string) any {
@@ -55,7 +67,16 @@ func (memtable *MemoryTable) LoadMemoryTable() error {
 	content := string(bytes)
 	memtable.enrichRecordsFromContent(content)
 
+	memtable.isLoaded = true
 	return nil
+}
+
+func (memtable *MemoryTable) IsLoaded() bool {
+	return memtable.isLoaded
+}
+
+func (memtable *MemoryTable) GetRecords() map[string]any {
+	return memtable.records
 }
 
 func (memtable *MemoryTable) enrichRecordsFromContent(content string) {
@@ -67,5 +88,4 @@ func (memtable *MemoryTable) enrichRecordsFromContent(content string) {
 			memtable.records[keyValue.Key] = keyValue.Value
 		}
 	}
-
 }

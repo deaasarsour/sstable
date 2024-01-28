@@ -2,7 +2,7 @@ package storage
 
 import (
 	"encoding/json"
-	filesystemmock "sstable/filesystem/mock"
+	"sstable/test/util/mockfilesystem"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ type metadata struct {
 
 func TestMetadata(t *testing.T) {
 	//arrange
-	rootDirectory := filesystemmock.NewDummyDirectory()
+	rootDirectory := mockfilesystem.NewDummyDirectory()
 	storageState, _ := NewStorageState(rootDirectory)
 	metadataInstance := metadata{
 		MemtableName: "test_123",
@@ -36,7 +36,7 @@ func TestMetadata(t *testing.T) {
 
 func TestMetadataInitializer(t *testing.T) {
 	//arrange
-	rootDirectory := filesystemmock.NewDummyDirectory()
+	rootDirectory := mockfilesystem.NewDummyDirectory()
 	storageState, _ := NewStorageState(rootDirectory)
 	metadataInstance := metadata{
 		MemtableName: "test_123",
@@ -57,7 +57,7 @@ func TestMetadataInitializer(t *testing.T) {
 
 func TestMetadataEmptry(t *testing.T) {
 	//arrange
-	rootDirectory := filesystemmock.NewDummyDirectory()
+	rootDirectory := mockfilesystem.NewDummyDirectory()
 	storageState, _ := NewStorageState(rootDirectory)
 
 	//act

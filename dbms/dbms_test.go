@@ -1,9 +1,9 @@
 package dbms
 
 import (
-	filesystem "sstable/filesystem"
-	mockfilesystem "sstable/filesystem/mock"
+	"sstable/filesystem"
 	"sstable/storage"
+	"sstable/test/util/mockfilesystem"
 )
 
 func createDummyDbmsWithDirectory(rootDirectory filesystem.DirectoryOperation, metadata *DatabaseMetadata) *DatabaseManagementSystem {

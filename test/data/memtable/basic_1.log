@@ -1,6 +1,6 @@
-{ "Key" : "score#deea" , "Value" : 0}
-{ "Key" : "score#player" , "Value" : 3}
-{ "Key" : "score#deea" , "Value" : 14}
-{ "Key" : "profile#deea" , "Value" : {"name" : "deea" , "user_id" : 12 , "metadata" : {"last_login" : 7}} }
-{ "Key" : "nickname#deea" , "Value" : "deeax99" }
+{ "key" : "score#deea" , "value" : 0}
+{ "key" : "score#player" , "value" : 3}
+{ "key" : "score#deea" , "value" : 14}
+{ "key" : "profile#deea" , "value" : {"name" : "deea" , "user_id" : 12 , "metadata" : {"last_login" : 7}} }
+{ "key" : "nickname#deea" , "value" : "deeax99" }
 

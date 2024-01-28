@@ -1,4 +1,4 @@
-package filesystem
+package mockfilesystem
 
 import (
 	"errors"
@@ -8,13 +8,6 @@ import (
 type DummyDirectory struct {
 	subDirectories map[string]*DummyDirectory
 	files          map[string]filesystem.FileOperation
-}
-
-func NewDummyDirectory() *DummyDirectory {
-	return &DummyDirectory{
-		subDirectories: make(map[string]*DummyDirectory),
-		files:          make(map[string]filesystem.FileOperation),
-	}
 }
 
 func (directory DummyDirectory) GetFiles() ([]string, error) {

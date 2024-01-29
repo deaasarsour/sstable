@@ -3,6 +3,7 @@ package testmemtable
 import (
 	"encoding/json"
 
+	"sstable/memtable"
 	"sstable/test/util/mockmemtable"
 	"sstable/util"
 	"strings"
@@ -10,8 +11,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-const BASIC_TEST_DATA = "basic_1.log"
 
 func getKeyValueJson(key string, value any) string {
 
@@ -85,4 +84,24 @@ func TestMemtableWrite(t *testing.T) {
 	//assert
 	assert.Equal(t, value, memtableValue)
 	assert.True(t, strings.Contains(content, expectedJson))
+}
+
+func TestCorruptedMemtable(t *testing.T) {
+	//arrange
+	expectValueBefore := 14.0
+	expectValueAfter := 19.0
+
+	//act
+	memtableBeforeWrite, file := mockmemtable.NewReadyCorruptedMemtable()
+	resultBefore := memtableBeforeWrite.Read("score#deea")
+	memtableBeforeWrite.Write("score#deea", 19)
+
+	memtableAfterWrite := memtable.NewMemoryTable(file)
+	memtableAfterWrite.LoadMemoryTable()
+	resultAfter := memtableAfterWrite.Read("score#deea")
+
+	//assert
+	assert.Equal(t, expectValueBefore, resultBefore)
+	assert.Equal(t, expectValueAfter, resultAfter)
+
 }

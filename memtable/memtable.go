@@ -64,6 +64,11 @@ func (memtable *MemoryTable) LoadMemoryTable() error {
 		return error
 	}
 
+	bytes, err := memtable.checkAndFixCorruption(bytes, memtable.file)
+	if err != nil {
+		return err
+	}
+
 	content := string(bytes)
 	memtable.enrichRecordsFromContent(content)
 
@@ -77,6 +82,24 @@ func (memtable *MemoryTable) IsLoaded() bool {
 
 func (memtable *MemoryTable) GetRecords() map[string]any {
 	return memtable.records
+}
+
+func (memtable *MemoryTable) checkAndFixCorruption(bytes []byte, file filesystem.FileOperation) ([]byte, error) {
+	if len(bytes) > 0 && bytes[len(bytes)-1] != '\n' {
+		newBytes := []byte{}
+		for i := len(bytes) - 1; i >= 0; i-- {
+			if bytes[i] == '\n' {
+				newBytes = bytes[:i+1]
+				break
+			}
+		}
+		if err := file.WriteAll(newBytes); err == nil {
+			return newBytes, nil
+		} else {
+			return nil, err
+		}
+	}
+	return bytes, nil
 }
 
 func (memtable *MemoryTable) enrichRecordsFromContent(content string) {

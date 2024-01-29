@@ -41,6 +41,11 @@ func (file *DummyFile) ReadAt(dest []byte, offset int) (int, error) {
 	}
 }
 
+func (file *DummyFile) WriteAll(content []byte) error {
+	file.content = content
+	return nil
+}
+
 func (file *DummyFile) Size() (int, error) {
 	return len(file.content), nil
 }

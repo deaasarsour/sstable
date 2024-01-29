@@ -10,7 +10,7 @@ type DummyDirectory struct {
 	files          map[string]filesystem.FileOperation
 }
 
-func (directory DummyDirectory) GetFiles() ([]string, error) {
+func (directory *DummyDirectory) GetFiles() ([]string, error) {
 
 	filesName := make([]string, len(directory.files))
 
@@ -23,7 +23,7 @@ func (directory DummyDirectory) GetFiles() ([]string, error) {
 	return filesName, nil
 }
 
-func (directory DummyDirectory) GetFile(fileName string) (filesystem.FileOperation, error) {
+func (directory *DummyDirectory) GetFile(fileName string) (filesystem.FileOperation, error) {
 	if value, ok := directory.files[fileName]; ok {
 		return value, nil
 	}

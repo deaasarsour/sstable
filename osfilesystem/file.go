@@ -11,6 +11,14 @@ type OsFileOperation struct {
 	osFile   *os.File
 }
 
+func NewOpenedOsFile(osFile *os.File) filesystem.FileOperation {
+	return &OsFileOperation{
+		osFile:   osFile,
+		filePath: osFile.Name(),
+	}
+
+}
+
 func NewOsFile(filePath string) filesystem.FileOperation {
 	return &OsFileOperation{
 		filePath: filePath,

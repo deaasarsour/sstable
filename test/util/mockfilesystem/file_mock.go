@@ -46,6 +46,6 @@ func (file *DummyFile) WriteAll(content []byte) error {
 	return nil
 }
 
-func (file *DummyFile) Size() (int, error) {
-	return len(file.content), nil
+func (file *DummyFile) Size() (int64, error) {
+	return int64(len(file.content)), nil
 }

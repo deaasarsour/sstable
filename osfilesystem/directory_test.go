@@ -14,25 +14,25 @@ func TestOsDirectory(t *testing.T) {
 	//act
 	directory := NewOsDirectory(tmp)
 
-	_, e1 := directory.CreateFile("sstable.txt", []byte("Hey"))
-	directoryA, e2 := directory.CreateDirectory("a")
-	_, e3 := directory.CreateDirectory("b")
+	_, createFileError := directory.CreateFile("sstable.txt", []byte("Hey"))
+	directoryA, directoryAError := directory.CreateDirectory("a")
+	_, directoryBError := directory.CreateDirectory("b")
 
-	_, e4 := directoryA.CreateDirectory("ia")
-	_, e5 := directoryA.CreateFile("sstableI.txt", []byte("No"))
+	_, InnerDirectoryError := directoryA.CreateDirectory("ia")
+	_, InnerFileError := directoryA.CreateFile("sstableI.txt", []byte("No"))
 
-	directories, e6 := directory.GetDirectories()
-	files, e7 := directory.GetFiles()
+	directories, getDirectoriesError := directory.GetDirectories()
+	files, getFilesError := directory.GetFiles()
 
 	//assert
 	assert.Nil(t, err)
-	assert.Nil(t, e1)
-	assert.Nil(t, e2)
-	assert.Nil(t, e3)
-	assert.Nil(t, e4)
-	assert.Nil(t, e5)
-	assert.Nil(t, e6)
-	assert.Nil(t, e7)
+	assert.Nil(t, createFileError)
+	assert.Nil(t, directoryAError)
+	assert.Nil(t, directoryBError)
+	assert.Nil(t, InnerDirectoryError)
+	assert.Nil(t, InnerFileError)
+	assert.Nil(t, getDirectoriesError)
+	assert.Nil(t, getFilesError)
 
 	assert.Equal(t, []string{"a", "b"}, directories)
 	assert.Equal(t, []string{"sstable.txt"}, files)

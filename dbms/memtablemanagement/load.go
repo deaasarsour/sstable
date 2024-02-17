@@ -1,8 +1,6 @@
 package memtablemanagement
 
 import (
-	"sstable/dbms/statemanagement"
-	"sstable/dbms/storage"
 	"sstable/filesystem"
 	"sstable/memtable"
 	"sstable/util"
@@ -59,15 +57,5 @@ func (memtableManagement *DatabaseMemtableManagement) LoadMemtable() error {
 		return memtableManagement.createMemtable()
 	} else {
 		return memtableManagement.loadMemtable(memtableFilename)
-	}
-}
-
-func NewMemtableManagement(
-	storage storage.StorageDirectories,
-	stateManagement *statemanagement.DatabaseManagementStateManagement) *DatabaseMemtableManagement {
-	return &DatabaseMemtableManagement{
-		storageDir:        storage,
-		stateManagement:   stateManagement,
-		stateGetOperation: stateManagement,
 	}
 }

@@ -8,6 +8,15 @@ import (
 const METADATA_FOLDER_NAME = "metadata"
 const MEMTABLE_FOLDER = "memtable"
 
+type MetadataOperation interface {
+	ReadMetadataRaw() ([]byte, error)
+	WriteMetadata(metadata any) error
+}
+type StorageDirectories interface {
+	GetRootDirectory() filesystem.DirectoryOperation
+	GetMemtableDirectory() filesystem.DirectoryOperation
+}
+
 type StorageState struct {
 	rootDirectory     filesystem.DirectoryOperation
 	metadataDirectory filesystem.DirectoryOperation

@@ -1,6 +1,7 @@
-package dbms
+package memtablemanagement_test
 
 import (
+	testdbms "sstable/test/util/dbms"
 	"sstable/test/util/mockfilesystem"
 	"testing"
 
@@ -9,12 +10,11 @@ import (
 
 func TestMemtableEmpty(t *testing.T) {
 	//arrange
-	dbms := createDummyDbms(nil)
-	dbms.initializeMetadata()
+	dbms := testdbms.NewDummyDbms(nil)
 
 	//act
-	dbms.initializeMemtable()
-	memtable := dbms.memoryTable.Load()
+	dbms.Initialize()
+	memtable := dbms.MemtableManagement.GetMemtable()
 
 	//assert
 	assert.NotNil(t, memtable)
@@ -26,21 +26,21 @@ func TestMemtableLoad(t *testing.T) {
 	key, value := "k", "v"
 
 	//act
-	dbms := createDummyDbmsWithDirectory(rootDirectory, nil)
-	dbms.initializeMetadata()
-	dbms.initializeMemtable()
-	memtable := dbms.memoryTable.Load()
+	dbms := testdbms.NewDummyDbmsDirectory(rootDirectory, nil)
+
+	dbms.Initialize()
+	memtable := dbms.MemtableManagement.GetMemtable()
 	memtable.Write(key, value)
 
-	dbms = createDummyDbmsWithDirectory(rootDirectory, nil)
-	dbms.initializeMetadata()
+	dbms = testdbms.NewDummyDbmsDirectory(rootDirectory, nil)
+	dbms.StateManagement.LoadMetadata()
 
-	memtableFolder := dbms.storage.GetMemtableDirectory()
+	memtableFolder := dbms.Storage.GetMemtableDirectory()
 	memtableFiles, _ := memtableFolder.GetFiles()
 	memtableFilesCount := len(memtableFiles)
 
-	dbms.initializeMemtable()
-	memtable = dbms.memoryTable.Load()
+	dbms.MemtableManagement.LoadMemtable()
+	memtable = dbms.MemtableManagement.GetMemtable()
 
 	//assert
 	assert.Equal(t, value, memtable.Read(key))

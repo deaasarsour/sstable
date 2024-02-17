@@ -8,7 +8,6 @@ import (
 
 var mutex sync.Mutex
 
-const UPDATE_NONE = 0
 const UPDATE_ALL = 1
 const UPDATE_STATE_WITHOUT_METADATA = 2
 
@@ -19,20 +18,17 @@ type DatabaseManagementStateManagement struct {
 	MetadataOperation storage.MetadataOperation
 }
 
-func (stateManagement *DatabaseManagementStateManagement) getUpdateType(newState *DatabaseManagementState) int {
+func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(newState *DatabaseManagementState) bool {
 	if stateManagement.IsState() {
 		currentState := stateManagement.GetState()
 		if *currentState.Metadata != *newState.Metadata {
-			return UPDATE_ALL
-		}
-		if currentState.MemoryTable != newState.MemoryTable {
-			return UPDATE_STATE_WITHOUT_METADATA
+			return true
 		}
 	} else {
-		return UPDATE_ALL
+		return true
 	}
 
-	return UPDATE_NONE
+	return false
 }
 
 func (stateManagement *DatabaseManagementStateManagement) cloneState() *DatabaseManagementState {
@@ -46,14 +42,10 @@ func (stateManagement *DatabaseManagementStateManagement) cloneState() *Database
 	}
 }
 
-func (stateManagement *DatabaseManagementStateManagement) updateState(newState *DatabaseManagementState, updateType int) error {
-	if updateType == UPDATE_NONE {
-		return nil
-	}
-
+func (stateManagement *DatabaseManagementStateManagement) updateState(newState *DatabaseManagementState, updateMetadata bool) error {
 	metadataOp := stateManagement.MetadataOperation
 
-	if updateType == UPDATE_ALL {
+	if updateMetadata {
 		if err := metadataOp.WriteMetadata(newState.Metadata); err != nil {
 			return err
 		}
@@ -70,8 +62,8 @@ func (stateManagement *DatabaseManagementStateManagement) StateUpdateSafe(exec D
 	dbState := stateManagement.cloneState()
 
 	if err := exec(dbState); err == nil {
-		updateType := stateManagement.getUpdateType(dbState)
-		return stateManagement.updateState(dbState, updateType)
+		updateMetadata := stateManagement.isMetadataNeedUpdate(dbState)
+		return stateManagement.updateState(dbState, updateMetadata)
 	} else {
 		return err
 	}

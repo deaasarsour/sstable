@@ -6,16 +6,12 @@ import (
 	"sync/atomic"
 )
 
-var mutex sync.Mutex
-
-const UPDATE_ALL = 1
-const UPDATE_STATE_WITHOUT_METADATA = 2
-
 type DatabaseStateAtomicChange = func(dbState *DatabaseManagementState) error
 
 type DatabaseManagementStateManagement struct {
 	DatabaseState     atomic.Pointer[DatabaseManagementState]
 	MetadataOperation storage.MetadataOperation
+	mutex             sync.Mutex
 }
 
 func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(newState *DatabaseManagementState) bool {
@@ -56,8 +52,8 @@ func (stateManagement *DatabaseManagementStateManagement) updateState(newState *
 }
 
 func (stateManagement *DatabaseManagementStateManagement) StateUpdateSafe(exec DatabaseStateAtomicChange) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+	stateManagement.mutex.Lock()
+	defer stateManagement.mutex.Unlock()
 
 	dbState := stateManagement.cloneState()
 

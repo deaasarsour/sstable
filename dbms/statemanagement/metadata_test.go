@@ -1,7 +1,7 @@
 package statemanagement_test
 
 import (
-	"sstable/dbms/statemanagement"
+	"sstable/dbms/state"
 	testdbms "sstable/test/util/dbms"
 	"testing"
 
@@ -24,7 +24,7 @@ func TestLoadMetadataEmpty(t *testing.T) {
 func TestLoadMetadataWithData(t *testing.T) {
 	//arrange
 	memtableFilename := "test"
-	metadata := &statemanagement.DatabaseMetadata{
+	metadata := &state.DatabaseMetadata{
 		MemtableFilename: memtableFilename,
 	}
 	dbms := testdbms.NewDummyDbms(metadata)

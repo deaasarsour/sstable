@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sstable/dbms/memtablemanagement"
+	"sstable/dbms/databasemanagement"
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
 	"sstable/filesystem"
@@ -10,17 +10,17 @@ import (
 type DatabaseManagementSystem struct {
 	Storage            *storage.StorageState
 	StateManagement    *statemanagement.DatabaseManagementStateManagement
-	MemtableManagement *memtablemanagement.DatabaseMemtableManagement
+	DatabaseManagement *databasemanagement.DatabaseManagement
 }
 
 func NewDatabaseManagedSystemFromStorage(storage *storage.StorageState) *DatabaseManagementSystem {
 	stateManagement := statemanagement.NewDatabaseStateManager(storage)
-	memtableManagement := memtablemanagement.NewMemtableManagement(storage, stateManagement)
+	databaseManagement := databasemanagement.NewDatabaseManagement(storage, stateManagement)
 
 	dbms := &DatabaseManagementSystem{
 		Storage:            storage,
 		StateManagement:    stateManagement,
-		MemtableManagement: memtableManagement,
+		DatabaseManagement: databaseManagement,
 	}
 
 	return dbms
@@ -49,8 +49,11 @@ func (dbms *DatabaseManagementSystem) Initialize() error {
 	if err := dbms.StateManagement.LoadMetadata(); err != nil {
 		return err
 	}
-	if err := dbms.MemtableManagement.LoadMemtable(); err != nil {
+	if err := dbms.DatabaseManagement.LoadMemtable(); err != nil {
 		return err
 	}
+
+	dbms.DatabaseManagement.InitializeBackgroundJobs()
+
 	return nil
 }

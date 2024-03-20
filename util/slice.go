@@ -25,3 +25,12 @@ func DeepCopy[T any](src []T, dest []T, startIndex, endIndex int) []T {
 	}
 	return dest
 }
+
+func CopyArray[T any](src []T) []T {
+	len := len(src)
+	dest := make([]T, len)
+	for i := 0; i < len; i++ {
+		dest[i] = src[i]
+	}
+	return dest
+}

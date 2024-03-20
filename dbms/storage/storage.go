@@ -7,6 +7,7 @@ import (
 
 const METADATA_FOLDER_NAME = "metadata"
 const MEMTABLE_FOLDER = "memtable"
+const SSTABLE_FOLDER = "sstable"
 
 type MetadataOperation interface {
 	ReadMetadataRaw() ([]byte, error)
@@ -15,12 +16,14 @@ type MetadataOperation interface {
 type StorageDirectories interface {
 	GetRootDirectory() filesystem.DirectoryOperation
 	GetMemtableDirectory() filesystem.DirectoryOperation
+	GetSStableDirectory() filesystem.DirectoryOperation
 }
 
 type StorageState struct {
 	rootDirectory     filesystem.DirectoryOperation
 	metadataDirectory filesystem.DirectoryOperation
 	memtable          filesystem.DirectoryOperation
+	sstable           filesystem.DirectoryOperation
 }
 
 func assignFolder(rootDirectory filesystem.DirectoryOperation, assignDirectory *filesystem.DirectoryOperation, fileName string) error {
@@ -38,6 +41,9 @@ func (storageState *StorageState) createMetadataFolder() error {
 func (storageState *StorageState) createMemtableFolder() error {
 	return assignFolder(storageState.rootDirectory, &storageState.memtable, MEMTABLE_FOLDER)
 }
+func (storageState *StorageState) createSStableFolder() error {
+	return assignFolder(storageState.rootDirectory, &storageState.sstable, SSTABLE_FOLDER)
+}
 
 func NewStorageState(rootDirectory filesystem.DirectoryOperation) (*StorageState, error) {
 	storageState := &StorageState{
@@ -46,6 +52,7 @@ func NewStorageState(rootDirectory filesystem.DirectoryOperation) (*StorageState
 	if err := util.TryRunAll(
 		storageState.createMetadataFolder,
 		storageState.createMemtableFolder,
+		storageState.createSStableFolder,
 	); err == nil {
 		return storageState, nil
 	} else {
@@ -58,5 +65,9 @@ func (storageState *StorageState) GetRootDirectory() filesystem.DirectoryOperati
 }
 
 func (storageState *StorageState) GetMemtableDirectory() filesystem.DirectoryOperation {
+	return storageState.memtable
+}
+
+func (storageState *StorageState) GetSStableDirectory() filesystem.DirectoryOperation {
 	return storageState.memtable
 }

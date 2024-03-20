@@ -1,20 +1,22 @@
-package memtablemanagement
+package databasemanagement
 
 import (
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
+	"sync"
 )
 
-type DatabaseMemtableManagement struct {
+type DatabaseManagement struct {
 	storageDir        storage.StorageDirectories
 	stateManagement   *statemanagement.DatabaseManagementStateManagement
 	stateGetOperation statemanagement.DatabaseManagementStateGetOperation
+	mutex             sync.Mutex
 }
 
-func NewMemtableManagement(
+func NewDatabaseManagement(
 	storage storage.StorageDirectories,
-	stateManagement *statemanagement.DatabaseManagementStateManagement) *DatabaseMemtableManagement {
-	return &DatabaseMemtableManagement{
+	stateManagement *statemanagement.DatabaseManagementStateManagement) *DatabaseManagement {
+	return &DatabaseManagement{
 		storageDir:        storage,
 		stateManagement:   stateManagement,
 		stateGetOperation: stateManagement,

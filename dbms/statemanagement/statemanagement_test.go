@@ -1,6 +1,7 @@
 package statemanagement_test
 
 import (
+	"sstable/dbms/state"
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
 	"sstable/test/util/mockfilesystem"
@@ -10,7 +11,6 @@ import (
 )
 
 func createDummyStateManagement(storageState storage.MetadataOperation) *statemanagement.DatabaseManagementStateManagement {
-
 	return statemanagement.NewDatabaseStateManager(storageState)
 }
 
@@ -19,16 +19,16 @@ func TestStateManagement(t *testing.T) {
 	rootDirectory := mockfilesystem.NewDummyDirectory()
 	storageState, _ := storage.NewStorageState(rootDirectory)
 
-	state := statemanagement.NewDatabaseState()
+	dbState := state.NewDatabaseState()
 	stateManagement := createDummyStateManagement(storageState)
 
-	exec := func(dbState *statemanagement.DatabaseManagementState) error {
+	exec := func(dbState *state.DatabaseManagementState) error {
 		dbState.Metadata.MemtableFilename = "memtable"
 		return nil
 	}
 
 	//arrange
-	stateManagement.DatabaseState.Store(state)
+	stateManagement.DatabaseState.Store(dbState)
 	oldState := stateManagement.DatabaseState.Load()
 
 	stateManagement.StateUpdateSafe(exec)
@@ -42,5 +42,4 @@ func TestStateManagement(t *testing.T) {
 	assert.Equal(t, "memtable", newState.Metadata.MemtableFilename)
 	assert.Equal(t, "", oldState.Metadata.MemtableFilename)
 	assert.Equal(t, "memtable", afterLoadState.Metadata.MemtableFilename)
-
 }

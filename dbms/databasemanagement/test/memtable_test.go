@@ -1,6 +1,8 @@
-package memtablemanagement_test
+package databasemanagement_test
 
 import (
+	"sstable/dbms/core"
+	"sstable/memtable"
 	testdbms "sstable/test/util/dbms"
 	"sstable/test/util/mockfilesystem"
 	"testing"
@@ -8,13 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func getMemtable(dbms *core.DatabaseManagementSystem) *memtable.MemoryTable {
+	state := dbms.StateManagement.GetState()
+	return state.MemoryTable
+}
+
 func TestMemtableEmpty(t *testing.T) {
 	//arrange
 	dbms := testdbms.NewDummyDbms(nil)
 
 	//act
 	dbms.Initialize()
-	memtable := dbms.MemtableManagement.GetMemtable()
+	memtable := getMemtable(dbms)
 
 	//assert
 	assert.NotNil(t, memtable)
@@ -29,7 +36,7 @@ func TestMemtableLoad(t *testing.T) {
 	dbms := testdbms.NewDummyDbmsDirectory(rootDirectory, nil)
 
 	dbms.Initialize()
-	memtable := dbms.MemtableManagement.GetMemtable()
+	memtable := getMemtable(dbms)
 	memtable.Write(key, value)
 
 	dbms = testdbms.NewDummyDbmsDirectory(rootDirectory, nil)
@@ -39,8 +46,8 @@ func TestMemtableLoad(t *testing.T) {
 	memtableFiles, _ := memtableFolder.GetFiles()
 	memtableFilesCount := len(memtableFiles)
 
-	dbms.MemtableManagement.LoadMemtable()
-	memtable = dbms.MemtableManagement.GetMemtable()
+	dbms.DatabaseManagement.LoadMemtable()
+	memtable = getMemtable(dbms)
 
 	//assert
 	assert.Equal(t, value, memtable.Read(key))

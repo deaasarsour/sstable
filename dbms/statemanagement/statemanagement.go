@@ -1,23 +1,33 @@
 package statemanagement
 
 import (
+	"sstable/dbms/state"
 	"sstable/dbms/storage"
 	"sync"
 	"sync/atomic"
 )
 
-type DatabaseStateAtomicChange = func(dbState *DatabaseManagementState) error
+type DatabaseManagementStateOperation interface {
+	DatabaseManagementStateGetOperation
+	SetState(state *state.DatabaseManagementState)
+	IsState() bool
+}
+type DatabaseManagementStateGetOperation interface {
+	GetState() *state.DatabaseManagementState
+}
+
+type DatabaseStateAtomicChange = func(dbState *state.DatabaseManagementState) error
 
 type DatabaseManagementStateManagement struct {
-	DatabaseState     atomic.Pointer[DatabaseManagementState]
+	DatabaseState     atomic.Pointer[state.DatabaseManagementState]
 	MetadataOperation storage.MetadataOperation
 	mutex             sync.Mutex
 }
 
-func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(newState *DatabaseManagementState) bool {
+func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(newState *state.DatabaseManagementState) bool {
 	if stateManagement.IsState() {
 		currentState := stateManagement.GetState()
-		if *currentState.Metadata != *newState.Metadata {
+		if currentState.Metadata != newState.Metadata {
 			return true
 		}
 	} else {
@@ -27,18 +37,15 @@ func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(n
 	return false
 }
 
-func (stateManagement *DatabaseManagementStateManagement) cloneState() *DatabaseManagementState {
+func (stateManagement *DatabaseManagementStateManagement) cloneState() *state.DatabaseManagementState {
 	if stateManagement.IsState() {
-		newDbState := *stateManagement.GetState()
-		newMetadata := *newDbState.Metadata
-		newDbState.Metadata = &newMetadata
-		return &newDbState
+		return state.CloneDatabaseState(stateManagement.GetState())
 	} else {
-		return NewDatabaseState()
+		return state.NewDatabaseState()
 	}
 }
 
-func (stateManagement *DatabaseManagementStateManagement) updateState(newState *DatabaseManagementState, updateMetadata bool) error {
+func (stateManagement *DatabaseManagementStateManagement) updateState(newState *state.DatabaseManagementState, updateMetadata bool) error {
 	metadataOp := stateManagement.MetadataOperation
 
 	if updateMetadata {

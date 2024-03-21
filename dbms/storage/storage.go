@@ -17,6 +17,7 @@ type StorageDirectories interface {
 	GetRootDirectory() filesystem.DirectoryOperation
 	GetMemtableDirectory() filesystem.DirectoryOperation
 	GetSStableDirectory() filesystem.DirectoryOperation
+	GetSStableFile(filename string) (filesystem.FileOperation, error)
 }
 
 type StorageState struct {
@@ -70,4 +71,9 @@ func (storageState *StorageState) GetMemtableDirectory() filesystem.DirectoryOpe
 
 func (storageState *StorageState) GetSStableDirectory() filesystem.DirectoryOperation {
 	return storageState.memtable
+}
+
+func (storageState *StorageState) GetSStableFile(filename string) (filesystem.FileOperation, error) {
+	directory := storageState.memtable
+	return directory.GetFile(filename)
 }

@@ -1,45 +1,17 @@
 package databasemanagement_test
 
 import (
-	"fmt"
-	"sstable/dbms/core"
-	"sstable/dbms/state"
-	"sstable/memtable"
-
 	testdbms "sstable/test/util/dbms"
-	"sstable/test/util/mockfilesystem"
+	"sstable/test/util/mockmemtable"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func createAlmostFullMemtable() *memtable.MemoryTable {
-	dummyFile := mockfilesystem.NewEmptyFile()
-	memoryTable := memtable.NewMemoryTable(dummyFile)
-
-	for i := 0; i < memtable.MemtableFull-1; i++ {
-		memoryTable.Write(fmt.Sprintf("key_%v", i), i)
-	}
-
-	return memoryTable
-}
-
-func updateMemtable(dbms *core.DatabaseManagementSystem, memtable *memtable.MemoryTable) {
-	dbms.StateManagement.StateUpdateSafe(func(dbState *state.DatabaseManagementState) error {
-		dbState.UpdateMemtable(memtable, "-")
-		return nil
-	})
-}
-
-func initializeDbms(dbms *core.DatabaseManagementSystem) {
-	dbms.StateManagement.LoadMetadata()
-	dbms.DatabaseManagement.LoadMemtable()
-}
-
 func TestWriteRead(t *testing.T) {
 	//arrange
 	dbms := testdbms.NewDummyDbms(nil)
-	initializeDbms(dbms)
+	testdbms.InitializeDbmsPartially(dbms)
 	databaseManagement := dbms.DatabaseManagement
 
 	//act
@@ -54,8 +26,8 @@ func TestWriteRead(t *testing.T) {
 func TestWriteReadFullMemtable(t *testing.T) {
 	//arrange
 	dbms := testdbms.NewDummyDbms(nil)
-	initializeDbms(dbms)
-	updateMemtable(dbms, createAlmostFullMemtable())
+	testdbms.InitializeDbmsPartially(dbms)
+	testdbms.UpdateMemtable(dbms, mockmemtable.NewAlmostFullMemtable())
 
 	databaseManagement := dbms.DatabaseManagement
 

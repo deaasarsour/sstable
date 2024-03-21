@@ -1,5 +1,7 @@
 package databasemanagement
 
+import "sstable/sstable"
+
 func (databaseManagement *DatabaseManagement) Read(key string) (any, error) {
 	state := databaseManagement.stateGetOperation.GetState()
 
@@ -11,6 +13,25 @@ func (databaseManagement *DatabaseManagement) Read(key string) (any, error) {
 		fulledMemtable := state.FulledMemoryTables[i]
 		if record := fulledMemtable.Read(key); record != nil {
 			return record, nil
+		}
+	}
+
+	sstableFilenames := state.Metadata.MemtableToSSTable
+	for i := len(sstableFilenames) - 1; i >= 0; i-- {
+		storage := databaseManagement.storageDir
+		sstableFilename := sstableFilenames[i]
+
+		if sstableFile, err := storage.GetSStableFile(sstableFilename); err == nil {
+			sstableClient := sstable.NewSSTable(sstableFile)
+			if record, err := sstableClient.Read(key); err == nil {
+				if record != nil {
+					return record, nil
+				}
+			} else {
+				return nil, err
+			}
+		} else {
+			return nil, err
 		}
 	}
 

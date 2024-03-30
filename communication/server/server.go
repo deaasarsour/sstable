@@ -30,7 +30,8 @@ func (server *DatabaseServer) StartListen() {
 			continue
 		}
 
-		go handleConnection(conn, server.dbms)
+		dbConnection := NewDatabaseConnection(conn, server.dbms)
+		go dbConnection.startCommunication()
 	}
 }
 

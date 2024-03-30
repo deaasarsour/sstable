@@ -1,9 +1,9 @@
 package main
 
 import (
+	"sstable/communication/server"
 	"sstable/dbms/core"
 	filesystemos "sstable/osfilesystem"
-	"sstable/server"
 )
 
 func main() {
@@ -19,6 +19,6 @@ func main() {
 		panic(err)
 	}
 
-	dbServer := server.NewDatabaseServer("0.0.0.0", 3009, dbms)
+	dbServer := server.NewDatabaseServer("127.0.0.1", 3009, dbms)
 	dbServer.StartListen()
 }

@@ -37,7 +37,12 @@ func (directory *OsDirectory) GetFiles() ([]string, error) {
 
 func (directory *OsDirectory) GetFile(fileName string) (filesystem.FileOperation, error) {
 	fullPath := path.Join(directory.path, fileName)
-	return NewOsFile(fullPath), nil
+	file := NewOsFile(fullPath)
+	if err := file.Open(); err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func (directory *OsDirectory) DeleteFile(fileName string) error {

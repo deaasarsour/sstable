@@ -70,10 +70,10 @@ func (storageState *StorageState) GetMemtableDirectory() filesystem.DirectoryOpe
 }
 
 func (storageState *StorageState) GetSStableDirectory() filesystem.DirectoryOperation {
-	return storageState.memtable
+	return storageState.sstable
 }
 
 func (storageState *StorageState) GetSStableFile(filename string) (filesystem.FileOperation, error) {
-	directory := storageState.memtable
+	directory := storageState.sstable
 	return directory.GetFile(filename)
 }

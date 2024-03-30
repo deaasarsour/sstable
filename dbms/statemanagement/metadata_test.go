@@ -2,7 +2,7 @@ package statemanagement_test
 
 import (
 	"sstable/dbms/state"
-	testdbms "sstable/test/util/dbms"
+	testdbms "sstable/test/util/testdbms"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

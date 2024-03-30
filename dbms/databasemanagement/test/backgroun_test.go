@@ -1,8 +1,8 @@
 package databasemanagement
 
 import (
-	testdbms "sstable/test/util/dbms"
 	"sstable/test/util/mockmemtable"
+	testdbms "sstable/test/util/testdbms"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

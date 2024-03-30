@@ -3,8 +3,8 @@ package databasemanagement_test
 import (
 	"sstable/dbms/core"
 	"sstable/memtable"
-	testdbms "sstable/test/util/dbms"
 	"sstable/test/util/mockfilesystem"
+	testdbms "sstable/test/util/testdbms"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

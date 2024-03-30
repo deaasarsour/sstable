@@ -7,9 +7,10 @@ import (
 )
 
 type DatabaseServer struct {
-	host string
-	port int
-	dbms *core.DatabaseManagementSystem
+	host     string
+	port     int
+	dbms     *core.DatabaseManagementSystem
+	Listener net.Listener
 }
 
 func (server *DatabaseServer) StartListen() {

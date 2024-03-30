@@ -1,4 +1,4 @@
-package dbms
+package testdbms
 
 import (
 	"sstable/dbms/core"

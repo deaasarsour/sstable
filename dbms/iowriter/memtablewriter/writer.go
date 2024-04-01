@@ -16,10 +16,17 @@ func (memtableWriter *MemtableWriterJob) WriterExec() {
 		state := memtableWriter.stateManagement.GetState()
 
 		var writeErr error = nil
+
+		keyValues := make([]util.KeyValueObject, 0)
 		for _, writeCommand := range writerData.writeCommands {
-			if err := state.MemoryTable.Write(writeCommand.Key, writeCommand.Value); err != nil {
-				writeErr = err
-			}
+			keyValues = append(keyValues, util.KeyValueObject{
+				Key:   writeCommand.Key,
+				Value: writeCommand.Value,
+			})
+		}
+
+		if err := state.MemoryTable.WriteBatch(keyValues); err != nil {
+			writeErr = err
 		}
 
 		if writeErr == nil && state.MemoryTable.IsFull() {

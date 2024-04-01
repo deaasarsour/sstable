@@ -35,6 +35,29 @@ func (memtable *MemoryTable) Write(key string, value any) error {
 	return nil
 }
 
+func (memtable *MemoryTable) WriteBatch(keyValues []util.KeyValueObject) error {
+	content := make([]byte, 0)
+
+	for _, keyValue := range keyValues {
+		bytes, err := json.Marshal(keyValue)
+		if err != nil {
+			return err
+		}
+
+		content = append(content, bytes...)
+		content = append(content, byte('\n'))
+	}
+
+	if err := memtable.file.AppendBytes(content); err != nil {
+		return err
+	}
+
+	for _, keyValue := range keyValues {
+		memtable.records[keyValue.Key] = keyValue.Value
+	}
+	return nil
+}
+
 func (memtable *MemoryTable) GetRecords() map[string]any {
 	return memtable.records
 }

@@ -6,7 +6,7 @@ import (
 	"sstable/util"
 )
 
-const receiverChanSize = 1024
+const receiverChanSize = 1 << 10
 
 type MemtableWriterJob struct {
 	stateManagement    *statemanagement.DatabaseManagementStateManagement

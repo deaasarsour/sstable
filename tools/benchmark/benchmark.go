@@ -18,7 +18,7 @@ func bulkload(dbReader *databasereader.DatabaseReader) {
 		dbReader.Write(key, key)
 		wg.Done()
 	}
-	const size = 500_000
+	const size = 1_000_000
 	for i := 0; i < size; i++ {
 		go write(i)
 	}

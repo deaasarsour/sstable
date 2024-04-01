@@ -12,11 +12,11 @@ type writeMessageContent struct {
 
 func (dbConnection *databaseConnection) executeMessage(dbMessage *common.DatabaseMessage) {
 
-	databaseReader := dbConnection.dbms.DatabaseReader
+	databaseIO := dbConnection.dbms.DatabaseIO
 
 	if dbMessage.Key == common.ReadKey {
 		key := string(dbMessage.Content)
-		result, err := databaseReader.Read(key)
+		result, err := databaseIO.Read(key)
 
 		if err != nil {
 			panic(err)
@@ -28,7 +28,7 @@ func (dbConnection *databaseConnection) executeMessage(dbMessage *common.Databas
 		if err := json.Unmarshal(dbMessage.Content, &writeMessage); err != nil {
 			panic(err)
 		}
-		databaseReader.Write(writeMessage.Key, writeMessage.Value)
+		databaseIO.Write(writeMessage.Key, writeMessage.Value)
 		dbConnection.WriteBack("wr", "write successful!")
 	} else {
 		dbConnection.WriteBack("kn", "key not found!")

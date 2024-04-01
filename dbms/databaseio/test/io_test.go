@@ -1,4 +1,4 @@
-package databasemanagement_test
+package databaseio_test
 
 import (
 	"sstable/test/util/mockmemtable"
@@ -12,12 +12,12 @@ func TestWriteRead(t *testing.T) {
 	//arrange
 	dbms := testdbms.NewDummyDbms(nil)
 	testdbms.InitializeDbmsPartially(dbms)
-	databaseReader := dbms.DatabaseReader
+	databaseIO := dbms.DatabaseIO
 
 	//act
-	databaseReader.Write("name", "deea")
+	databaseIO.Write("name", "deea")
 
-	readResult, _ := databaseReader.Read("name")
+	readResult, _ := databaseIO.Read("name")
 
 	//assert
 	assert.Equal(t, "deea", readResult)
@@ -29,11 +29,11 @@ func TestWriteReadFullMemtable(t *testing.T) {
 	testdbms.InitializeDbmsPartially(dbms)
 	testdbms.UpdateMemtable(dbms, mockmemtable.NewAlmostFullMemtable())
 
-	databaseReader := dbms.DatabaseReader
+	databaseIO := dbms.DatabaseIO
 
 	//act
-	databaseReader.Write("name", "deea")
-	readResult, _ := databaseReader.Read("name")
+	databaseIO.Write("name", "deea")
+	readResult, _ := databaseIO.Read("name")
 	state := dbms.StateManagement.GetState()
 
 	//assert

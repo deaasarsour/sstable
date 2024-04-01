@@ -2,7 +2,7 @@ package core
 
 import (
 	"sstable/dbms/components/memtablemanagement"
-	databasereader "sstable/dbms/ioreader"
+	"sstable/dbms/databaseio"
 	"sstable/dbms/iowriter/fullmemtableflusher"
 	"sstable/dbms/iowriter/memtablewriter"
 	"sstable/dbms/statemanagement"
@@ -16,7 +16,7 @@ type DatabaseManagementSystem struct {
 	MemtableWriterJob   *memtablewriter.MemtableWriterJob
 	MemtableManagement  *memtablemanagement.MemtableManagement
 	FullMemtableFlusher *fullmemtableflusher.FullMemtableFlusher
-	DatabaseReader      *databasereader.DatabaseReader
+	DatabaseIO          *databaseio.DatabaseIO
 }
 
 func NewDatabaseManagedSystemFromStorage(storage *storage.StorageState) *DatabaseManagementSystem {
@@ -24,11 +24,11 @@ func NewDatabaseManagedSystemFromStorage(storage *storage.StorageState) *Databas
 	memtableManagement := memtablemanagement.NewMemtableManagement(storage, stateManagement)
 	memtableWriterJob := memtablewriter.NewMemtableWriteJob(stateManagement, memtableManagement)
 	fullMemtableFlusher := fullmemtableflusher.NewFullMemtableFlusher(storage, stateManagement)
-	databaseReader := databasereader.NewDatabaseReader(storage, stateManagement, memtableWriterJob)
+	databaseIO := databaseio.NewDatabaseIO(storage, stateManagement, memtableWriterJob)
 	dbms := &DatabaseManagementSystem{
 		Storage:             storage,
 		StateManagement:     stateManagement,
-		DatabaseReader:      databaseReader,
+		DatabaseIO:          databaseIO,
 		MemtableWriterJob:   memtableWriterJob,
 		MemtableManagement:  memtableManagement,
 		FullMemtableFlusher: fullMemtableFlusher,

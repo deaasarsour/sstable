@@ -1,4 +1,4 @@
-package databasemanagement_test
+package memtablemanagement_test
 
 import (
 	"sstable/dbms/core"

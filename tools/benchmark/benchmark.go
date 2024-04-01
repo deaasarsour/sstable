@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"os"
 	"sstable/dbms/core"
-	databasereader "sstable/dbms/ioreader"
+	"sstable/dbms/databaseio"
 	filesystemos "sstable/osfilesystem"
 	"sync"
 	"time"
 )
 
-func bulkload(dbReader *databasereader.DatabaseReader) {
+func bulkload(io *databaseio.DatabaseIO) {
 	var wg sync.WaitGroup
 	write := func(i int) {
 		wg.Add(1)
 		key := fmt.Sprintf("key_%v", i)
-		dbReader.Write(key, key)
+		io.Write(key, key)
 		wg.Done()
 	}
 	const size = 500_000
@@ -43,7 +43,7 @@ func main() {
 
 	startTime := time.Now()
 
-	bulkload(dbms.DatabaseReader)
+	bulkload(dbms.DatabaseIO)
 
 	endTime := time.Now()
 

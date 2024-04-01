@@ -1,4 +1,4 @@
-package databasemanagement
+package fullmemtableflusher_test
 
 import (
 	"sstable/test/util/mockmemtable"
@@ -18,10 +18,12 @@ func TestFulledMemtable(t *testing.T) {
 	testdbms.AddFullMemtable(dbms, memtable)
 
 	//act
-	databaseManagement := dbms.DatabaseManagement
-	databaseManagement.FlushFulledSStable()
+	databaseReader := dbms.DatabaseReader
+	fullMemtableFlusher := dbms.FullMemtableFlusher
+
+	fullMemtableFlusher.FlushFulledSStable()
 	state := dbms.StateManagement.GetState()
-	readResult, _ := databaseManagement.Read("name")
+	readResult, _ := databaseReader.Read("name")
 
 	//assert
 	assert.Equal(t, 0, len(state.FulledMemoryTables))

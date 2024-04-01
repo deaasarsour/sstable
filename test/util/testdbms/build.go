@@ -42,5 +42,7 @@ func AddFullMemtable(dbms *core.DatabaseManagementSystem, memtable *memtable.Mem
 
 func InitializeDbmsPartially(dbms *core.DatabaseManagementSystem) {
 	dbms.StateManagement.LoadMetadata()
-	dbms.DatabaseManagement.LoadMemtable()
+	dbms.MemtableManagement.Initialize()
+	dbms.MemtableWriterJob.Initialize()
+
 }

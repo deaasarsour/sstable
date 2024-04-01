@@ -12,12 +12,12 @@ func TestWriteRead(t *testing.T) {
 	//arrange
 	dbms := testdbms.NewDummyDbms(nil)
 	testdbms.InitializeDbmsPartially(dbms)
-	databaseManagement := dbms.DatabaseManagement
+	databaseReader := dbms.DatabaseReader
 
 	//act
-	databaseManagement.Write("name", "deea")
+	databaseReader.Write("name", "deea")
 
-	readResult, _ := databaseManagement.Read("name")
+	readResult, _ := databaseReader.Read("name")
 
 	//assert
 	assert.Equal(t, "deea", readResult)
@@ -29,11 +29,11 @@ func TestWriteReadFullMemtable(t *testing.T) {
 	testdbms.InitializeDbmsPartially(dbms)
 	testdbms.UpdateMemtable(dbms, mockmemtable.NewAlmostFullMemtable())
 
-	databaseManagement := dbms.DatabaseManagement
+	databaseReader := dbms.DatabaseReader
 
 	//act
-	databaseManagement.Write("name", "deea")
-	readResult, _ := databaseManagement.Read("name")
+	databaseReader.Write("name", "deea")
+	readResult, _ := databaseReader.Read("name")
 	state := dbms.StateManagement.GetState()
 
 	//assert

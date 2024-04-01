@@ -1,26 +1,37 @@
 package core
 
 import (
-	"sstable/dbms/databasemanagement"
+	"sstable/dbms/components/memtablemanagement"
+	databasereader "sstable/dbms/ioreader"
+	"sstable/dbms/iowriter/fullmemtableflusher"
+	"sstable/dbms/iowriter/memtablewriter"
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
 	"sstable/filesystem"
 )
 
 type DatabaseManagementSystem struct {
-	Storage            *storage.StorageState
-	StateManagement    *statemanagement.DatabaseManagementStateManagement
-	DatabaseManagement *databasemanagement.DatabaseManagement
+	Storage             *storage.StorageState
+	StateManagement     *statemanagement.DatabaseManagementStateManagement
+	MemtableWriterJob   *memtablewriter.MemtableWriterJob
+	MemtableManagement  *memtablemanagement.MemtableManagement
+	FullMemtableFlusher *fullmemtableflusher.FullMemtableFlusher
+	DatabaseReader      *databasereader.DatabaseReader
 }
 
 func NewDatabaseManagedSystemFromStorage(storage *storage.StorageState) *DatabaseManagementSystem {
 	stateManagement := statemanagement.NewDatabaseStateManager(storage)
-	databaseManagement := databasemanagement.NewDatabaseManagement(storage, stateManagement)
-
+	memtableManagement := memtablemanagement.NewMemtableManagement(storage, stateManagement)
+	memtableWriterJob := memtablewriter.NewMemtableWriteJob(stateManagement, memtableManagement)
+	fullMemtableFlusher := fullmemtableflusher.NewFullMemtableFlusher(storage, stateManagement)
+	databaseReader := databasereader.NewDatabaseReader(storage, stateManagement, memtableWriterJob)
 	dbms := &DatabaseManagementSystem{
-		Storage:            storage,
-		StateManagement:    stateManagement,
-		DatabaseManagement: databaseManagement,
+		Storage:             storage,
+		StateManagement:     stateManagement,
+		DatabaseReader:      databaseReader,
+		MemtableWriterJob:   memtableWriterJob,
+		MemtableManagement:  memtableManagement,
+		FullMemtableFlusher: fullMemtableFlusher,
 	}
 
 	return dbms
@@ -49,11 +60,12 @@ func (dbms *DatabaseManagementSystem) Initialize() error {
 	if err := dbms.StateManagement.LoadMetadata(); err != nil {
 		return err
 	}
-	if err := dbms.DatabaseManagement.LoadMemtable(); err != nil {
+	if err := dbms.MemtableManagement.Initialize(); err != nil {
 		return err
 	}
 
-	dbms.DatabaseManagement.InitializeBackgroundJobs()
+	dbms.MemtableWriterJob.Initialize()
+	dbms.FullMemtableFlusher.Initialize()
 
 	return nil
 }

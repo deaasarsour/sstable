@@ -22,6 +22,7 @@ type DatabaseManagementStateManagement struct {
 	DatabaseState     atomic.Pointer[state.DatabaseManagementState]
 	MetadataOperation storage.MetadataOperation
 	mutex             sync.Mutex
+	getStateLock      sync.Mutex
 }
 
 func (stateManagement *DatabaseManagementStateManagement) isMetadataNeedUpdate(newState *state.DatabaseManagementState) bool {

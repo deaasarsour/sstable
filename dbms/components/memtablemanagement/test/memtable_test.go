@@ -46,7 +46,7 @@ func TestMemtableLoad(t *testing.T) {
 	memtableFiles, _ := memtableFolder.GetFiles()
 	memtableFilesCount := len(memtableFiles)
 
-	dbms.DatabaseManagement.LoadMemtable()
+	dbms.MemtableManagement.Initialize()
 	memtable = getMemtable(dbms)
 
 	//assert

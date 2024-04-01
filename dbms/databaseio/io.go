@@ -1,4 +1,4 @@
-package databasereader
+package databaseio
 
 import (
 	"sstable/dbms/iowriter/memtablewriter"
@@ -7,14 +7,14 @@ import (
 	"sstable/sstable"
 )
 
-type DatabaseReader struct {
+type DatabaseIO struct {
 	memtableWriter  *memtablewriter.MemtableWriterJob
 	storageDir      storage.StorageDirectories
 	stateManagement *statemanagement.DatabaseManagementStateManagement
 }
 
-func (databaseManagement *DatabaseReader) Read(key string) (any, error) {
-	state := databaseManagement.stateManagement.GetState()
+func (io *DatabaseIO) Read(key string) (any, error) {
+	state := io.stateManagement.GetState()
 
 	if record := state.MemoryTable.Read(key); record != nil {
 		return record, nil
@@ -29,7 +29,7 @@ func (databaseManagement *DatabaseReader) Read(key string) (any, error) {
 
 	sstableFilenames := state.Metadata.MemtableToSSTable
 	for i := len(sstableFilenames) - 1; i >= 0; i-- {
-		storage := databaseManagement.storageDir
+		storage := io.storageDir
 		sstableFilename := sstableFilenames[i]
 
 		if sstableFile, err := storage.GetSStableFile(sstableFilename); err == nil {
@@ -49,18 +49,18 @@ func (databaseManagement *DatabaseReader) Read(key string) (any, error) {
 	return nil, nil
 }
 
-func (databaseManagement *DatabaseReader) Write(key string, value any) error {
+func (databaseManagement *DatabaseIO) Write(key string, value any) error {
 	return databaseManagement.memtableWriter.Write(memtablewriter.WriteCommand{
 		Key:   key,
 		Value: value,
 	})
 }
 
-func NewDatabaseReader(
+func NewDatabaseIO(
 	storage storage.StorageDirectories,
 	stateManagement *statemanagement.DatabaseManagementStateManagement,
-	memtableWriter *memtablewriter.MemtableWriterJob) *DatabaseReader {
-	return &DatabaseReader{
+	memtableWriter *memtablewriter.MemtableWriterJob) *DatabaseIO {
+	return &DatabaseIO{
 		storageDir:      storage,
 		stateManagement: stateManagement,
 		memtableWriter:  memtableWriter,

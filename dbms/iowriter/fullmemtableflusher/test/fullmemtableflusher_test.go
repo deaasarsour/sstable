@@ -18,12 +18,12 @@ func TestFulledMemtable(t *testing.T) {
 	testdbms.AddFullMemtable(dbms, memtable)
 
 	//act
-	databaseReader := dbms.DatabaseReader
+	databaseIO := dbms.DatabaseIO
 	fullMemtableFlusher := dbms.FullMemtableFlusher
 
 	fullMemtableFlusher.FlushFulledSStable()
 	state := dbms.StateManagement.GetState()
-	readResult, _ := databaseReader.Read("name")
+	readResult, _ := databaseIO.Read("name")
 
 	//assert
 	assert.Equal(t, 0, len(state.FulledMemoryTables))

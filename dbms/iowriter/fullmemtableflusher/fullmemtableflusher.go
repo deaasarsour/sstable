@@ -21,14 +21,10 @@ func (memtableFlusher *FullMemtableFlusher) Initialize() {
 
 func (memtableFlusher *FullMemtableFlusher) FlushFulledSStable() {
 	stateManagement := memtableFlusher.stateManagement
-	curState := stateManagement.GetAtomicState(nil)
+	curState := stateManagement.GetState()
 
 	if len(curState.FulledMemoryTables) > 0 {
 		memtable := curState.FulledMemoryTables[0]
-
-		if !memtable.CanFlushing() {
-			return
-		}
 
 		if sstableFilename, err := componentsutil.CreateSStable(memtable, memtableFlusher.storageDir); err == nil {
 

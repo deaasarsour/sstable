@@ -1,7 +1,6 @@
 package memtablewriter
 
 import (
-	"sstable/dbms/state"
 	"sstable/util"
 )
 
@@ -14,11 +13,7 @@ func (memtableWriter *MemtableWriterJob) WriterExec() {
 	for {
 		writerData := <-memtableWriter.writerChan
 
-		blockMemtableFlushing := func(dbState *state.DatabaseManagementState) {
-			dbState.MemoryTable.LockFlushing()
-		}
-
-		state := memtableWriter.stateManagement.GetAtomicState(blockMemtableFlushing)
+		state := memtableWriter.stateManagement.GetState()
 
 		var writeErr error = nil
 		for _, writeCommand := range writerData.writeCommands {

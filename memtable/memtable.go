@@ -2,7 +2,6 @@ package memtable
 
 import (
 	"sstable/filesystem"
-	"sync/atomic"
 )
 
 type MemoryTableIO interface {
@@ -17,10 +16,9 @@ type MemoryTableLowLevel interface {
 }
 
 type MemoryTable struct {
-	file      filesystem.FileOperation
-	records   map[string]any
-	isLoaded  bool
-	flushLock atomic.Bool
+	file     filesystem.FileOperation
+	records  map[string]any
+	isLoaded bool
 }
 
 func NewMemoryTable(file filesystem.FileOperation) *MemoryTable {

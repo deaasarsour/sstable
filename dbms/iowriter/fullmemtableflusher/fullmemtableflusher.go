@@ -25,6 +25,11 @@ func (memtableFlusher *FullMemtableFlusher) FlushFulledSStable() {
 
 	if len(curState.FulledMemoryTables) > 0 {
 		memtable := curState.FulledMemoryTables[0]
+
+		if !memtable.CanFlushing() {
+			return
+		}
+
 		if sstableFilename, err := componentsutil.CreateSStable(memtable, memtableFlusher.storageDir); err == nil {
 
 			exec := func(dbState *state.DatabaseManagementState) error {

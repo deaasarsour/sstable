@@ -6,7 +6,8 @@ import (
 	"sstable/util"
 )
 
-const receiverChanSize = 1 << 10
+const receiverChanSize = 1 << 16
+const receiverWorkers = 12
 
 type MemtableWriterJob struct {
 	stateManagement    *statemanagement.DatabaseManagementStateManagement
@@ -15,13 +16,10 @@ type MemtableWriterJob struct {
 	writerChan         chan writerChanData
 }
 
-type WriteCommand struct {
-	Key   string
-	Value any
-}
-
 func (memtableWriter *MemtableWriterJob) Initialize() {
-	go util.RunInLoop(memtableWriter.ReceiverExec)
+	for i := 0; i < receiverWorkers; i++ {
+		go util.RunInLoop(memtableWriter.ReceiverExec)
+	}
 	go util.RunInLoop(memtableWriter.WriterExec)
 }
 

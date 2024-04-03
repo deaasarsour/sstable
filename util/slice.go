@@ -34,3 +34,21 @@ func CopyArray[T any](src []T) []T {
 	}
 	return dest
 }
+
+func Combine[T any](arrays [][]T) []T {
+	totalLen := 0
+	for i := range arrays {
+		totalLen += len(arrays[i])
+	}
+	res := make([]T, totalLen)
+	globalIndex := 0
+
+	for i := range arrays {
+		for j := range arrays[i] {
+			res[globalIndex] = arrays[i][j]
+			globalIndex++
+		}
+	}
+
+	return res
+}

@@ -5,7 +5,7 @@ import (
 	"sstable/util"
 )
 
-const MemtableFull = 1024
+const MemtableSizeCap = 1 << 20
 
 func (memtable *MemoryTable) Read(key string) any {
 	value, ok := memtable.records[key]
@@ -26,7 +26,7 @@ func (memtable *MemoryTable) Write(key string, value any) error {
 
 	line := string(bytes) + "\n"
 
-	if err = memtable.file.AppendBytes([]byte(line)); err != nil {
+	if err = memtable.AppendBytes([]byte(line)); err != nil {
 		return err
 	}
 
@@ -48,7 +48,30 @@ func (memtable *MemoryTable) WriteBatch(keyValues []util.KeyValueObject) error {
 		content = append(content, byte('\n'))
 	}
 
-	if err := memtable.file.AppendBytes(content); err != nil {
+	if err := memtable.AppendBytes(content); err != nil {
+		return err
+	}
+
+	for _, keyValue := range keyValues {
+		memtable.records[keyValue.Key] = keyValue.Value
+	}
+	return nil
+}
+
+func (memtable *MemoryTable) WriteBatchRaw(keyValues []util.KeyValueObject, rawBytes []byte) error {
+	content := make([]byte, 0)
+
+	for _, keyValue := range keyValues {
+		bytes, err := json.Marshal(keyValue)
+		if err != nil {
+			return err
+		}
+
+		content = append(content, bytes...)
+		content = append(content, byte('\n'))
+	}
+
+	if err := memtable.AppendBytes(content); err != nil {
 		return err
 	}
 
@@ -63,5 +86,19 @@ func (memtable *MemoryTable) GetRecords() map[string]any {
 }
 
 func (memtable *MemoryTable) IsFull() bool {
-	return len(memtable.records) >= MemtableFull
+	return memtable.numOfBytes >= MemtableSizeCap
+}
+
+func (memtable *MemoryTable) AppendBytes(bytes []byte) error {
+	if err := memtable.file.AppendBytes(bytes); err != nil {
+		return err
+	}
+
+	memtable.numOfBytes += len(bytes)
+
+	return nil
+}
+
+func (memtable *MemoryTable) WillBeFullAfterWrite(writeByteCount int) bool {
+	return memtable.numOfBytes+writeByteCount >= MemtableSizeCap
 }

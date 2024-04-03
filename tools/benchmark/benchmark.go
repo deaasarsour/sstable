@@ -13,12 +13,12 @@ import (
 func bulkload(io *databaseio.DatabaseIO) {
 	var wg sync.WaitGroup
 	write := func(i int) {
-		wg.Add(1)
 		key := fmt.Sprintf("key_%v", i)
 		io.Write(key, key)
 		wg.Done()
 	}
 	const size = 1_000_000
+	wg.Add(size)
 	for i := 0; i < size; i++ {
 		go write(i)
 	}
@@ -29,7 +29,7 @@ func bulkload(io *databaseio.DatabaseIO) {
 func main() {
 	tmp, _ := os.MkdirTemp("", "")
 	defer os.Remove(tmp)
-
+	fmt.Printf("tmp folder : %v\n", tmp)
 	directory := filesystemos.NewOsDirectory(tmp)
 
 	dbms, err := core.NewDatabaseManagedSystem(directory)

@@ -44,7 +44,7 @@ func NewAlmostFullMemtable() *memtable.MemoryTable {
 	dummyFile := mockfilesystem.NewEmptyFile()
 	memoryTable := memtable.NewMemoryTable(dummyFile)
 
-	for i := 0; i < memtable.MemtableFull-1; i++ {
+	for i := 0; i < memtable.MemtableSizeCap-1; i++ {
 		memoryTable.Write(fmt.Sprintf("key_%v", i), i)
 	}
 
@@ -55,7 +55,7 @@ func NewFullMemtable() *memtable.MemoryTable {
 	dummyFile := mockfilesystem.NewEmptyFile()
 	memoryTable := memtable.NewMemoryTable(dummyFile)
 
-	for i := 0; i < memtable.MemtableFull; i++ {
+	for i := 0; i < memtable.MemtableSizeCap; i++ {
 		memoryTable.Write(fmt.Sprintf("key_%v", i), i)
 	}
 

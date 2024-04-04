@@ -16,9 +16,10 @@ type MemoryTableLowLevel interface {
 }
 
 type MemoryTable struct {
-	file     filesystem.FileOperation
-	records  map[string]any
-	isLoaded bool
+	file       filesystem.FileOperation
+	records    map[string]any
+	isLoaded   bool
+	numOfBytes int
 }
 
 func NewMemoryTable(file filesystem.FileOperation) *MemoryTable {

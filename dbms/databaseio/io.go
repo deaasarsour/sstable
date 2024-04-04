@@ -5,6 +5,7 @@ import (
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
 	"sstable/sstable"
+	"sstable/util"
 )
 
 type DatabaseIO struct {
@@ -50,7 +51,7 @@ func (io *DatabaseIO) Read(key string) (any, error) {
 }
 
 func (databaseManagement *DatabaseIO) Write(key string, value any) error {
-	return databaseManagement.memtableWriter.Write(memtablewriter.WriteCommand{
+	return databaseManagement.memtableWriter.Write(util.KeyValueObject{
 		Key:   key,
 		Value: value,
 	})

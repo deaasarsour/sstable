@@ -21,6 +21,7 @@ func (memtable *MemoryTable) LoadMemoryTable() error {
 
 	content := string(bytes)
 	memtable.enrichRecordsFromContent(content)
+	memtable.numOfBytes = len(content)
 
 	memtable.isLoaded = true
 	return nil

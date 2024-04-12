@@ -3,7 +3,7 @@ package memtablewriter
 import (
 	"sstable/dbms/components/memtablemanagement"
 	"sstable/dbms/statemanagement"
-	"sstable/util"
+	jobutil "sstable/util/job"
 )
 
 const receiverChanSize = 1 << 16
@@ -18,9 +18,9 @@ type MemtableWriterJob struct {
 
 func (memtableWriter *MemtableWriterJob) Initialize() {
 	for i := 0; i < receiverWorkers; i++ {
-		go util.RunInLoop(memtableWriter.ReceiverExec)
+		go jobutil.RunInLoop(memtableWriter.ReceiverExec)
 	}
-	go util.RunInLoop(memtableWriter.WriterExec)
+	go jobutil.RunInLoop(memtableWriter.WriterExec)
 }
 
 func NewMemtableWriteJob(

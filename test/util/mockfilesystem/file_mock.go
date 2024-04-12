@@ -2,7 +2,7 @@ package mockfilesystem
 
 import (
 	"io"
-	"sstable/util"
+	"sstable/util/sliceutil"
 )
 
 type DummyFile struct {
@@ -31,10 +31,10 @@ func (file *DummyFile) ReadAt(dest []byte, offset int) (int, error) {
 	fileLen := len(file.content)
 
 	if destLen+offset-1 < fileLen {
-		util.DeepCopy[byte](file.content, dest, offset, offset+destLen-1)
+		sliceutil.CopySubArray[byte](file.content, dest, offset, offset+destLen-1)
 		return destLen, nil
 	} else if fileLen > offset {
-		util.DeepCopy[byte](file.content, dest, offset, fileLen-1)
+		sliceutil.CopySubArray[byte](file.content, dest, offset, fileLen-1)
 		return fileLen - offset, io.EOF
 	} else {
 		return 0, io.EOF

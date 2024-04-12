@@ -1,4 +1,4 @@
-package util
+package channelutil
 
 func ReadBatch[T any](c chan T, maxBatchSize int) []T {
 	res := make([]T, 0)

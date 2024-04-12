@@ -2,10 +2,10 @@ package memtable
 
 import (
 	"encoding/json"
-	"sstable/util"
+	"sstable/types"
 )
 
-func GetWriteByte(keyValue util.KeyValueObject) ([]byte, error) {
+func GetWriteByte(keyValue types.KeyValueObject) ([]byte, error) {
 	bytes, err := json.Marshal(keyValue)
 	if err != nil {
 		return nil, err

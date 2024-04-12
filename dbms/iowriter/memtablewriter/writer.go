@@ -2,13 +2,16 @@ package memtablewriter
 
 import (
 	"sstable/memtable"
-	"sstable/util"
+	"sstable/types"
+	"sstable/util/awaitable"
+
+	"github.com/samber/lo"
 )
 
 type writerChanData struct {
-	futureGroup   *util.FutureGroup[error]
-	writeCommands []util.KeyValueObject
-	writeBytes    [][]byte
+	awaitableResultGroup *awaitable.AwaitableGroup[error]
+	writeCommands        []types.KeyValueObject
+	writeBytes           [][]byte
 }
 
 func (memtableWriter *MemtableWriterJob) WriterExec() {
@@ -16,7 +19,7 @@ func (memtableWriter *MemtableWriterJob) WriterExec() {
 		writerData := <-memtableWriter.writerChan
 		err := memtableWriter.writerExecLogic(writerData)
 
-		writerData.futureGroup.SetResult(err)
+		writerData.awaitableResultGroup.SetResult(err)
 	}
 }
 
@@ -28,7 +31,7 @@ func (memtableWriter *MemtableWriterJob) writerExecLogic(writerData writerChanDa
 	for currentWindow != len(writerData.writeBytes) {
 		nextWindow := getNextWriteWindowStart(currentWindow, state.MemoryTable, writerData)
 
-		bytes := util.Combine(writerData.writeBytes[currentWindow:nextWindow])
+		bytes := lo.Flatten(writerData.writeBytes[currentWindow:nextWindow])
 		writeCommands := writerData.writeCommands[currentWindow:nextWindow]
 
 		if err := state.MemoryTable.WriteBatchRaw(writeCommands, bytes); err != nil {

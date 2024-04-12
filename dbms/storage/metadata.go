@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"sort"
 	"sstable/filesystem"
-	"sstable/util"
 	"time"
+
+	"github.com/samber/lo"
 )
 
 func getMetadataFromSortedFiles(sortedFiles []string, dir filesystem.DirectoryOperation) ([]byte, string) {
@@ -51,7 +52,7 @@ func (storage *StorageState) ReadMetadataRaw() ([]byte, error) {
 	}
 
 	sort.Strings(files)
-	util.Reverse(&files)
+	files = lo.Reverse(files)
 
 	metadata, metadataFileName := getMetadataFromSortedFiles(files, dir)
 

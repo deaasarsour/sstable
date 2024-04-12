@@ -1,4 +1,4 @@
-package util
+package errorutil
 
 func TryRunAll(execs ...func() error) error {
 	for _, exec := range execs {

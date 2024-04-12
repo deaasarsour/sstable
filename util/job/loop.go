@@ -1,4 +1,4 @@
-package util
+package jobutil
 
 func RunInLoop(exec func()) {
 	for {

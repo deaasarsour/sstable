@@ -2,7 +2,7 @@ package storage
 
 import (
 	"sstable/filesystem"
-	"sstable/util"
+	errorutil "sstable/util/error"
 )
 
 const METADATA_FOLDER_NAME = "metadata"
@@ -50,7 +50,7 @@ func NewStorageState(rootDirectory filesystem.DirectoryOperation) (*StorageState
 	storageState := &StorageState{
 		rootDirectory: rootDirectory,
 	}
-	if err := util.TryRunAll(
+	if err := errorutil.TryRunAll(
 		storageState.createMetadataFolder,
 		storageState.createMemtableFolder,
 		storageState.createSStableFolder,

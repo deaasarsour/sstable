@@ -2,7 +2,7 @@ package memtable
 
 import (
 	"encoding/json"
-	"sstable/util"
+	"sstable/types"
 )
 
 const MemtableSizeCap = 1 << 20
@@ -17,7 +17,7 @@ func (memtable *MemoryTable) Read(key string) any {
 }
 
 func (memtable *MemoryTable) Write(key string, value any) error {
-	keyValue := util.KeyValueObject{Key: key, Value: value}
+	keyValue := types.KeyValueObject{Key: key, Value: value}
 	bytes, err := json.Marshal(keyValue)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func (memtable *MemoryTable) Write(key string, value any) error {
 	return nil
 }
 
-func (memtable *MemoryTable) WriteBatch(keyValues []util.KeyValueObject) error {
+func (memtable *MemoryTable) WriteBatch(keyValues []types.KeyValueObject) error {
 	content := make([]byte, 0)
 
 	for _, keyValue := range keyValues {
@@ -58,7 +58,7 @@ func (memtable *MemoryTable) WriteBatch(keyValues []util.KeyValueObject) error {
 	return nil
 }
 
-func (memtable *MemoryTable) WriteBatchRaw(keyValues []util.KeyValueObject, rawBytes []byte) error {
+func (memtable *MemoryTable) WriteBatchRaw(keyValues []types.KeyValueObject, rawBytes []byte) error {
 	content := make([]byte, 0)
 
 	for _, keyValue := range keyValues {

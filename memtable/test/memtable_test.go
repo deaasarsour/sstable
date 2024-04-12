@@ -5,7 +5,7 @@ import (
 
 	"sstable/memtable"
 	"sstable/test/util/mockmemtable"
-	"sstable/util"
+	"sstable/types"
 	"strings"
 	"testing"
 
@@ -14,7 +14,7 @@ import (
 
 func getKeyValueJson(key string, value any) string {
 
-	keyValue := util.KeyValueObject{Key: key, Value: value}
+	keyValue := types.KeyValueObject{Key: key, Value: value}
 	bytes, err := json.Marshal(keyValue)
 
 	if err != nil {

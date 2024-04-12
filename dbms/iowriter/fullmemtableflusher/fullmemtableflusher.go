@@ -5,7 +5,7 @@ import (
 	"sstable/dbms/state"
 	"sstable/dbms/statemanagement"
 	"sstable/dbms/storage"
-	"sstable/util"
+	jobutil "sstable/util/job"
 
 	"time"
 )
@@ -16,7 +16,7 @@ type FullMemtableFlusher struct {
 }
 
 func (memtableFlusher *FullMemtableFlusher) Initialize() {
-	go util.RunInLoop(memtableFlusher.FlushFulledSStable)
+	go jobutil.RunInLoop(memtableFlusher.FlushFulledSStable)
 }
 
 func (memtableFlusher *FullMemtableFlusher) FlushFulledSStable() {

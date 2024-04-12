@@ -1,4 +1,4 @@
-package util
+package types
 
 type KeyValueObject struct {
 	Key   string `json:"key"`

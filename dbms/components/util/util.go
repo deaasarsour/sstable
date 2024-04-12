@@ -2,14 +2,14 @@ package util
 
 import (
 	"sstable/filesystem"
-	"sstable/util"
+	randomutil "sstable/util/random"
 )
 
 func generateMemtableName() string {
-	return util.CreateULID("memtable")
+	return randomutil.CreateULID("memtable")
 }
 func generateSSTableName() string {
-	return util.CreateULID("sstable")
+	return randomutil.CreateULID("sstable")
 }
 
 func createDBFile(name string, directory filesystem.DirectoryOperation) (filesystem.FileOperation, string, error) {

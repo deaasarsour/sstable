@@ -1,4 +1,4 @@
-package util
+package randomutil
 
 import (
 	"fmt"

@@ -3,7 +3,7 @@ package memtable
 import (
 	"encoding/json"
 	"sstable/filesystem"
-	"sstable/util"
+	"sstable/types"
 	"strings"
 )
 
@@ -52,7 +52,7 @@ func (memtable *MemoryTable) checkAndFixCorruption(bytes []byte, file filesystem
 func (memtable *MemoryTable) enrichRecordsFromContent(content string) {
 	lines := strings.Split(content, "\n")
 	for _, line := range lines {
-		var keyValue *util.KeyValueObject
+		var keyValue *types.KeyValueObject
 		err := json.Unmarshal([]byte(line), &keyValue)
 		if err == nil {
 			memtable.records[keyValue.Key] = keyValue.Value

@@ -2,7 +2,7 @@ package state
 
 import (
 	"sstable/memtable"
-	"sstable/util"
+	"sstable/util/sliceutil"
 )
 
 type DatabaseManagementState struct {
@@ -21,6 +21,6 @@ func CloneDatabaseState(src *DatabaseManagementState) *DatabaseManagementState {
 	return &DatabaseManagementState{
 		Metadata:           src.Metadata.DeepCopy(),
 		MemoryTable:        src.MemoryTable,
-		FulledMemoryTables: util.CopyArray(src.FulledMemoryTables),
+		FulledMemoryTables: sliceutil.CopyArray(src.FulledMemoryTables),
 	}
 }

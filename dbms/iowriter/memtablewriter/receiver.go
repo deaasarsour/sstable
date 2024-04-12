@@ -2,52 +2,52 @@ package memtablewriter
 
 import (
 	"sstable/memtable"
-	"sstable/util"
+	"sstable/types"
+	"sstable/util/awaitable"
+	"sstable/util/channelutil"
 )
 
 type receiverChanData struct {
-	writeCommand util.KeyValueObject
-	future       *util.Future[error]
+	writeCommand types.KeyValueObject
+	awaitable    *awaitable.Awaitable[error]
 }
 
 func (memtableWriter *MemtableWriterJob) ReceiverExec() {
-	cnt := 0
 	for {
-		receiverDataBatch := util.ReadBatch(memtableWriter.receiverChan, receiverChanSize)
+		receiverDataBatch := channelutil.ReadBatch(memtableWriter.receiverChan, receiverChanSize)
 		batchSize := len(receiverDataBatch)
-		cnt += batchSize
 		writerData := writerChanData{
 			writeBytes:    make([][]byte, 0, batchSize),
-			writeCommands: make([]util.KeyValueObject, 0, batchSize),
+			writeCommands: make([]types.KeyValueObject, 0, batchSize),
 		}
 
-		futures := make([]*util.Future[error], 0, batchSize)
+		awaitables := make([]*awaitable.Awaitable[error], 0, batchSize)
 
 		for i := range receiverDataBatch {
 
-			future := receiverDataBatch[i].future
+			awaitable := receiverDataBatch[i].awaitable
 			writeCommand := receiverDataBatch[i].writeCommand
 
 			if bytes, err := memtable.GetWriteByte(writeCommand); err == nil {
-				futures = append(futures, future)
+				awaitables = append(awaitables, awaitable)
 				writerData.writeBytes = append(writerData.writeBytes, bytes)
 				writerData.writeCommands = append(writerData.writeCommands, writeCommand)
 			} else {
-				receiverDataBatch[i].future.SetResult(err)
+				receiverDataBatch[i].awaitable.SetResult(err)
 			}
 		}
 
-		writerData.futureGroup = util.NewFutureGroup(futures)
+		writerData.awaitableResultGroup = awaitable.NewAwaitableGroup(awaitables)
 		memtableWriter.writerChan <- writerData
 	}
 }
 
-func (memtableWriter *MemtableWriterJob) Write(writeCommand util.KeyValueObject) error {
+func (memtableWriter *MemtableWriterJob) Write(writeCommand types.KeyValueObject) error {
 
-	future := util.NewFuture[error]()
+	future := awaitable.NewAwaitable[error]()
 	receiverData := receiverChanData{
 		writeCommand: writeCommand,
-		future:       future,
+		awaitable:    future,
 	}
 
 	memtableWriter.receiverChan <- receiverData

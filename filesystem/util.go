@@ -1,6 +1,8 @@
 package filesystem
 
-import "sstable/util"
+import (
+	"github.com/samber/lo"
+)
 
 func GetOrCreateDirectory(directoryOperation DirectoryOperation, directoryName string) (DirectoryOperation, error) {
 	directories, err := directoryOperation.GetDirectories()
@@ -9,7 +11,7 @@ func GetOrCreateDirectory(directoryOperation DirectoryOperation, directoryName s
 		return nil, err
 	}
 
-	if util.IsContains(directories, &directoryName) {
+	if lo.Contains(directories, directoryName) {
 		if directory, err := directoryOperation.GetDirectory(directoryName); err == nil {
 			return directory, nil
 		} else {
